@@ -24,3 +24,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl cluster-info
 kubectl get nodes
 ```
+
+# Credits
+
+- based on: https://github.com/coolsvap/kubeadm-vagrant
