@@ -45,7 +45,7 @@ curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add -
 cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl kubernetes-cni=0.7.5-00
+apt-get update && apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl kubernetes-cni=0.7.5-00
 
 cat > /etc/docker/daemon.json <<EOF
 {
