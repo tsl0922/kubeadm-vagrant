@@ -1,5 +1,5 @@
 BOX_IMAGE = "ubuntu/xenial64"
-MASTER_COUNT = 3
+MASTER_COUNT = 1
 NODE_COUNT = 2
 MASTER_IP = "192.168.26.10"
 MASTER_PORT = "8443"
@@ -39,12 +39,13 @@ curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
 cat > /etc/apt/sources.list.d/docker-ce.list <<EOF
 deb http://mirrors.aliyun.com/docker-ce/linux/ubuntu xenial stable
 EOF
+apt-get update && apt-get install -y docker-ce=#{DOCKER_VER}
+
 curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
 cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
-apt-get update
-apt-get install -y docker-ce=#{DOCKER_VER} kubelet=#{KUBE_VER}-00 kubeadm kubectl kubernetes-cni=0.7.5-00
+apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl kubernetes-cni=0.7.5-00
 
 cat > /etc/docker/daemon.json <<EOF
 {
@@ -79,10 +80,11 @@ set -eo pipefail
 kubeadm reset -f
 kubeadm init --image-repository #{IMAGE_REPO} \
              --apiserver-advertise-address=#{MASTER_IP} \
+             --apiserver-bind-port=#{MASTER_PORT} \
              --kubernetes-version v#{KUBE_VER} \
              --pod-network-cidr=#{POD_NW_CIDR} \
              --token #{KUBE_TOKEN} \
-             --token-ttl 0
+             --token-ttl 0 | tee /vagrant/kubeadm.log
 
 mkdir -p $HOME/.kube
 sudo cp -Rf /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -247,19 +249,21 @@ Vagrant.configure("2") do |config|
   config.hostmanager.manage_guest = true
 
   (1..MASTER_COUNT).each do |i|
-    config.vm.define "master#{i}" do |subconfig|
-      subconfig.vm.hostname = "master#{i}"
-      subconfig.vm.network :private_network, nic_type: "virtio", ip: NODE_IP_NW + "#{i + 10}"
+    ha = MASTER_COUNT > 1
+    hostname= "master#{ha ? i: ''}"
+    config.vm.define(hostname) do |subconfig|
+      subconfig.vm.hostname = hostname
+      subconfig.vm.network :private_network, nic_type: "virtio", ip: ha ? NODE_IP_NW + "#{i + 10}" : MASTER_IP
       subconfig.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--cpus", "2"]
         vb.customize ["modifyvm", :id, "--memory", "2048"]
       end
-      subconfig.vm.provision :shell, inline: (MASTER_COUNT > 1) ? ha_script : master_script
+      subconfig.vm.provision :shell, inline: ha ? ha_script : master_script
     end
   end
 
   (1..NODE_COUNT).each do |i|
-    config.vm.define "node#{i}" do |subconfig|
+    config.vm.define("node#{i}") do |subconfig|
       subconfig.vm.hostname = "node#{i}"
       subconfig.vm.network :private_network, nic_type: "virtio", ip: NODE_IP_NW + "#{i + 20}"
       subconfig.vm.provision :shell, inline: node_script
