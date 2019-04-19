@@ -15,7 +15,7 @@ def gen_haproxy_backend(master_count)
   server=""
   (1..master_count).each do |i|
     ip = NODE_IP_NW + "#{i + 10}"
-    server << "    server apiserver#{i} #{ip}:6443 check port 6443 inter 5000 fall 5\n"
+    server << "    server apiserver#{i} #{ip}:6443 check\n"
   end
   server
 end
@@ -166,28 +166,34 @@ sleep 10
 
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
-    chroot  /var/lib/haproxy
-    daemon
-    group haproxy
-    user haproxy
-    log 127.0.0.1:514 local0 warning
-    pidfile /var/lib/haproxy.pid
-    maxconn 20000
-    spread-checks 3
-    nbproc 8
+  log /dev/log  local0
+  log /dev/log  local1 notice
+  chroot /var/lib/haproxy
+  user haproxy
+  group haproxy
+  daemon
 
 defaults
     log     global
-    mode    tcp
-    retries 3
-    option redispatch
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5s
+    timeout client 50s
+    timeout client-fin 50s
+    timeout server 50s
+    timeout tunnel 1h
 
-listen https-apiserver
+listen stats
+    bind *:1080
+    stats refresh 30s
+    stats uri /stats
+
+listen kube-api-server
     bind #{MASTER_IP}:#{MASTER_PORT}
     mode tcp
+    option tcplog
     balance roundrobin
-    timeout server 15s
-    timeout connect 15s
 
 #{gen_haproxy_backend(MASTER_COUNT)}
 EOF
