@@ -1,6 +1,6 @@
 # kubeadm-vagrant
 
-Run kubernetes cluster with kubeadm on vagrant
+Run kubernetes cluster with kubeadm on vagrant.
 
 # Requirements
 
@@ -10,12 +10,12 @@ Run kubernetes cluster with kubeadm on vagrant
 
 # Usage
 
-Run `vagrant up` and wait for the cluster to be set up.
+Run `vagrant up` and wait for the cluster to be set up (change `MASTER_COUNT` to `3` to run a ha cluster).
 
 To use `kubectl` on the master node, run:
 
-```
-vagrant ssh master
+```bash
+vagrant ssh master # use master1 if you are running ha cluster
 
 mkdir -p $HOME/.kube
 sudo cp -Rf /etc/kubernetes/admin.conf $HOME/.kube/config
