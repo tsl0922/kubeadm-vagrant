@@ -34,6 +34,7 @@ vm.swappiness=0
 EOF
 sysctl --system
 
+echo "apt_preserve_sources_list: true" > /etc/cloud/cloud.cfg.d/99-apt-preserve-sources-list.cfg
 sed -i 's/\\(archive\\|security\\)\\.ubuntu\\.com/mirrors\\.aliyun\\.com/g' /etc/apt/sources.list
 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
 cat > /etc/apt/sources.list.d/docker-ce.list <<EOF
