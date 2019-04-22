@@ -1,13 +1,13 @@
-BOX_IMAGE = "ubuntu/xenial64"
+BOX_IMAGE    = "ubuntu/xenial64"
 MASTER_COUNT = 1
-NODE_COUNT = 2
-MASTER_IP = "192.168.26.10"
-MASTER_PORT = "8443"
-NODE_IP_NW = "192.168.26."
-POD_NW_CIDR = "10.244.0.0/16"
+NODE_COUNT   = 2
+MASTER_IP    = "192.168.26.10"
+MASTER_PORT  = "8443"
+NODE_IP_NW   = "192.168.26."
+POD_NW_CIDR  = "10.244.0.0/16"
 
-DOCKER_VER = "18.06.2~ce~3-0~ubuntu"
-KUBE_VER = "1.14.1"
+DOCKER_VER = "5:18.09.5~3-0~ubuntu-xenial"
+KUBE_VER   = "1.14.1"
 KUBE_TOKEN = "ayngk7.m1555duk5x2i3ctt"
 IMAGE_REPO = "registry.aliyuncs.com/google_containers"
 
