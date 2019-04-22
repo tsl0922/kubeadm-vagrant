@@ -69,8 +69,9 @@ node_script = <<SCRIPT
 
 set -eo pipefail
 
+discovery_token_ca_cert_hash="$(grep 'discovery-token-ca-cert-hash' /vagrant/kubeadm.log | head -n1 | awk '{print $2}')"
 kubeadm reset -f
-kubeadm join --discovery-token-unsafe-skip-ca-verification --token #{KUBE_TOKEN} #{MASTER_IP}:#{MASTER_PORT}
+kubeadm join #{MASTER_IP}:#{MASTER_PORT} --token #{KUBE_TOKEN} --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash}
 SCRIPT
 
 master_script = <<SCRIPT
@@ -232,10 +233,12 @@ EOF
   status "installing flannel network addon.."
   kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
 else
-  status "joining other master node.."
+  status "joining master node.."
+  discovery_token_ca_cert_hash="$(grep 'discovery-token-ca-cert-hash' /vagrant/kubeadm.log | head -n1 | awk '{print $2}')"
   certificate_key="$(grep 'certificate-key' /vagrant/kubeadm.log | head -n1 | awk '{print $3}')"
+  kubeadm reset -f
   kubeadm join #{MASTER_IP}:#{MASTER_PORT} --token #{KUBE_TOKEN} \
-    --discovery-token-unsafe-skip-ca-verification \
+    --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash} \
     --experimental-control-plane --certificate-key ${certificate_key} \
     --apiserver-advertise-address ${vrrp_ip}
 fi
