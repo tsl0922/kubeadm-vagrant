@@ -92,7 +92,7 @@ mkdir -p $HOME/.kube
 sudo cp -Rf /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+kubectl apply -f /vagrant/kube-flannel.yml
 SCRIPT
 
 ha_script = <<SCRIPT
@@ -231,7 +231,7 @@ EOF
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
   
   status "installing flannel network addon.."
-  kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+  kubectl apply -f /vagrant/kube-flannel.yml
 else
   status "joining master node.."
   discovery_token_ca_cert_hash="$(grep 'discovery-token-ca-cert-hash' /vagrant/kubeadm.log | head -n1 | awk '{print $2}')"
