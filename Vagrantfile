@@ -7,7 +7,7 @@ NODE_IP_NW   = "192.168.26."
 POD_NW_CIDR  = "10.244.0.0/16"
 
 DOCKER_VER = "5:18.09.5~3-0~ubuntu-xenial"
-KUBE_VER   = "1.14.1"
+KUBE_VER   = "1.14.3"
 KUBE_TOKEN = "ayngk7.m1555duk5x2i3ctt"
 IMAGE_REPO = "registry.aliyuncs.com/google_containers"
 
