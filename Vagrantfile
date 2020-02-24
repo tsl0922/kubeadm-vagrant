@@ -7,7 +7,7 @@ NODE_IP_NW   = "192.168.26."
 POD_NW_CIDR  = "10.244.0.0/16"
 
 DOCKER_VER = "5:18.09.5~3-0~ubuntu-xenial"
-KUBE_VER   = "1.16.0"
+KUBE_VER   = "1.16.7"
 KUBE_TOKEN = "ayngk7.m1555duk5x2i3ctt"
 IMAGE_REPO = "registry.aliyuncs.com/google_containers"
 
@@ -204,7 +204,7 @@ systemctl restart haproxy
 
 if [ ${vrrp_state} = "MASTER" ]; then
   cat > /tmp/kubeadm-config.yaml <<EOF
-apiVersion: kubeadm.k8s.io/v1beta1
+apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 bootstrapTokens:
 - token: #{KUBE_TOKEN}
@@ -213,7 +213,7 @@ localAPIEndpoint:
   advertiseAddress: ${vrrp_ip}
   bindPort: 6443
 ---
-apiVersion: kubeadm.k8s.io/v1beta1
+apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: v#{KUBE_VER}
 controlPlaneEndpoint: "#{MASTER_IP}:#{MASTER_PORT}"
@@ -224,7 +224,7 @@ EOF
 
   status "running kubeadm init on the first master node.."
   kubeadm reset -f
-  kubeadm init --config=/tmp/kubeadm-config.yaml --experimental-upload-certs | tee /vagrant/kubeadm.log
+  kubeadm init --config=/tmp/kubeadm-config.yaml --upload-certs | tee /vagrant/kubeadm.log
 
   mkdir -p $HOME/.kube
   sudo cp -Rf /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -239,7 +239,7 @@ else
   kubeadm reset -f
   kubeadm join #{MASTER_IP}:#{MASTER_PORT} --token #{KUBE_TOKEN} \
     --discovery-token-ca-cert-hash ${discovery_token_ca_cert_hash} \
-    --experimental-control-plane --certificate-key ${certificate_key} \
+    --control-plane --certificate-key ${certificate_key} \
     --apiserver-advertise-address ${vrrp_ip}
 fi
 SCRIPT

@@ -2,6 +2,8 @@
 
 Run kubernetes cluster with kubeadm on vagrant.
 
+> **Reference:** [Creating Highly Available clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/)
+
 # Requirements
 
 1. virtualbox: https://www.virtualbox.org/wiki/Downloads
@@ -24,6 +26,12 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl cluster-info
 kubectl get nodes
 ```
+
+# Pod Network
+
+- Reference: [Installing a Pod network add-on](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network)
+- `kube-flannel.yml` changes: added the `--iface` option ([ref](https://github.com/coreos/flannel/blob/master/Documentation/troubleshooting.md#vagrant))
+
 
 # Credits
 
