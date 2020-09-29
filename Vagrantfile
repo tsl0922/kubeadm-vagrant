@@ -7,9 +7,9 @@ NODE_IP_NW   = "192.168.26."
 POD_NW_CIDR  = "10.244.0.0/16"
 
 DOCKER_VER = "5:19.03.4~3-0~ubuntu-xenial"
-KUBE_VER   = "1.17.4"
+KUBE_VER   = "1.19.2"
 KUBE_TOKEN = "ayngk7.m1555duk5x2i3ctt"
-IMAGE_REPO = "registry.aliyuncs.com/google_containers"
+IMAGE_REPO = "k8s.gcr.io"
 
 def gen_haproxy_backend(master_count)
   server=""
@@ -35,18 +35,18 @@ EOF
 sysctl --system
 
 echo "apt_preserve_sources_list: true" > /etc/cloud/cloud.cfg.d/99-apt-preserve-sources-list.cfg
-sed -i 's/\\(archive\\|security\\)\\.ubuntu\\.com/mirrors\\.aliyun\\.com/g' /etc/apt/sources.list
-curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
-cat > /etc/apt/sources.list.d/docker-ce.list <<EOF
-deb http://mirrors.aliyun.com/docker-ce/linux/ubuntu xenial stable
-EOF
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
 apt-get update && apt-get install -y docker-ce=#{DOCKER_VER}
 
-curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - 
 cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-apt-get update && apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl kubernetes-cni=0.7.5-00
+apt-get update && apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl
 
 cat > /etc/docker/daemon.json <<EOF
 {
