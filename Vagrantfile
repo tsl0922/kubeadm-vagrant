@@ -46,7 +46,7 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat > /etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
-apt-get update && apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm kubectl
+apt-get update && apt-get install -y kubelet=#{KUBE_VER}-00 kubeadm=#{KUBE_VER}-00 kubectl=#{KUBE_VER}-00
 
 cat > /etc/docker/daemon.json <<EOF
 {
