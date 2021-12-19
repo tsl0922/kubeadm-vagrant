@@ -1,13 +1,13 @@
 BOX_IMAGE    = "ubuntu/xenial64"
 MASTER_COUNT = 1
 NODE_COUNT   = 2
-MASTER_IP    = "192.168.26.10"
+MASTER_IP    = "192.168.56.10"
 MASTER_PORT  = "8443"
-NODE_IP_NW   = "192.168.26."
+NODE_IP_NW   = "192.168.56."
 POD_NW_CIDR  = "10.244.0.0/16"
 
 DOCKER_VER = "5:19.03.4~3-0~ubuntu-xenial"
-KUBE_VER   = "1.19.2"
+KUBE_VER   = "1.23.1"
 KUBE_TOKEN = "ayngk7.m1555duk5x2i3ctt"
 IMAGE_REPO = "k8s.gcr.io"
 
@@ -109,8 +109,8 @@ apt-get install -y keepalived haproxy
 
 systemctl stop keepalived || true
 
-vrrp_if=$(ip a | grep 192.168.26 | awk '{print $7}')
-vrrp_ip=$(ip a | grep 192.168.26 | awk '{split($2, a, "/"); print a[1]}')
+vrrp_if=$(ip a | grep 192.168.56 | awk '{print $7}')
+vrrp_ip=$(ip a | grep 192.168.56 | awk '{split($2, a, "/"); print a[1]}')
 vrrp_state="BACKUP"
 vrrp_priority="100"
 if [ "${vrrp_ip}" = "#{NODE_IP_NW}11" ]; then
